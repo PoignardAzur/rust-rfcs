@@ -25,7 +25,7 @@ Starting with the questions given at the end of the [old RFC's mortician's note]
 # Motivation
 [motivation]: #motivation
 
-Rust has a dysfunctional relationship with objects that are large or variable in size. It can accept them as parameters pretty well using references, but creating them is unwieldy and inneficient:
+Rust has a dysfunctional relationship with objects that are large or variable in size. It can accept them as parameters pretty well using references, but creating them is unwieldy and inefficient:
 
 * A function pretty much has to use `Vec` to create huge arrays, even if the array is fixed size. The way you'd want to do it, `Box::new([0; 1_000_000])`, will allocate the array on the stack and then copy it into the Box. This same form of copying shows up in tons of API's, like serde's Serialize trait.
 * There's no safe way to create gigantic, singular structs without overhead. If your 1M array is wrapped in a struct, then the only safe way to dynamically allocate one is to use `Box::new(MyStruct::new())`, which ends up creating an instance of `MyStruct` on the stack and copying it to the box, 1M array included.
@@ -912,7 +912,9 @@ I also believe that this RFC is a good base for future development. While I don'
 
 ## Integration with futures, streams, serde, and other I/O stuff
 
-<details>This RFC does not compose terribly well with `Result`, `Option`, and other pattern-matching constructs; this makes it hard to use with async APIs. `Future` and `Stream`, in particular, wraps the result of polling in the `Poll` enum, so while it's certainly possible to allocate such a result into a `Box<Poll<T>>` without copying, its not possible to get a `Box<T>` without copying given the existing futures API.
+<details>
+
+This RFC does not compose terribly well with `Result`, `Option`, and other pattern-matching constructs; this makes it hard to use with async APIs. `Future` and `Stream`, in particular, wraps the result of polling in the `Poll` enum, so while it's certainly possible to allocate such a result into a `Box<Poll<T>>` without copying, its not possible to get a `Box<T>` without copying given the existing futures API.
 
 Mapping doesn't work, either, because it will pass the payload of a future as a parameter, which means that futures have to allocate storage for their contents. Sized types work as usual, and `Future<[u8]>` would wind up allocating stack space for the byte blob in order to pass it to the mapping function as a move-ref, as described in [RFC 1901 "unsized rvalues"](https://github.com/rust-lang/rfcs/blob/master/text/1909-unsized-rvalues.md).
 
@@ -1017,11 +1019,14 @@ trait Serializer {
   }
 }
 ```
+
 </details>
 
 ## Named Return Value Optimization
 
-<details>In this context, NRVO refers to the ability to write code like:
+<details>
+
+In this context, NRVO refers to the ability to write code like:
 
 ```rust
 let x = initial_state;
@@ -1112,4 +1117,5 @@ while still eliding copies.
 The second code has the advantage of being easier to follow semantically. Values are created, set and mutated before being used, with no nesting involved.
 
 On the other hand, the caveats mentionned with lazy arguments apply again, except on fire. This feature would essentially involve the compiler lying to the developer about how their code executes. This is nothing new in the context of compiler optimizations, but in the context of language semantics, it's not something to be considered lightly.
+
 </details>
