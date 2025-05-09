@@ -224,7 +224,7 @@ There is no need for a `const(always) fn` syntax, for example, because a functio
 
 ### Const trait example: Default
 
-To see an example of how const traits, const impls, const methods and const bounds combine, see the Default trait:
+To see an example of how const traits, const impls, const methods and const bounds come together, see the Default trait:
 
 ```rust
 const trait Default {
@@ -497,7 +497,7 @@ Thus that approach was abandoned after proponents and opponents cooperated in tr
 
 ### Sites where `const(always) Trait` bounds can be used
 
-Everywhere where non-const trait bounds can be written.
+Everywhere non-const trait bounds can be written.
 
 
 ### `const` desugaring
@@ -883,14 +883,6 @@ const fn foo<T: Foo>() -> T {
 }
 ```
 
-The disadvantage of this is that sometimes, it creates stricter bounds than desired.
-
-```rust
-const fn foo<T: Foo>() {
-    T::ASSOC_CONST
-}
-```
-
 There's a few arguments against that syntax:
 
 - `?Sized` bounds have a history of being error-prone to implement, and the lang team doesn't want to add anything similar (https://github.com/rust-lang/rust/issues/135229, https://github.com/rust-lang/rust/pull/132209).
@@ -902,7 +894,7 @@ Opt-in bounds are easier to explain and easier to implement correctly by default
 
 ## Mixing const and non-const trait methods
 
-The previous RFC proposed a syntax for const traits which lets the user a lot of freedom in mixing const and non-const features:
+The [previous RFC](https://github.com/oli-obk/rfcs/blob/const-trait-impl/text/0000-const-trait-impls.md) proposed a syntax for const traits which lets the user a lot of freedom in mixing const and non-const features:
 
 - `const` methods in non-`const` traits.
 - `const` and non-`const` methods in the same trait.
@@ -960,16 +952,15 @@ Please do not debate between either alternative in the comments.
 # Prior art
 [prior-art]: #prior-art
 
-**TODO**
-
-* I tried to get this accepted before under https://github.com/rust-lang/rfcs/pull/2632.
+* [RFC #3762](https://github.com/oli-obk/rfcs/blob/const-trait-impl/text/0000-const-trait-impls.md) by oli-obk, which this document is based on.
+* [RFC #2632](https://github.com/rust-lang/rfcs/pull/2632) by oli-obk.
     * While that moved to [FCP](https://github.com/rust-lang/rfcs/pull/2632#issuecomment-481395097), it had concerns raised.
     * [T-lang discussed this](https://github.com/rust-lang/rfcs/pull/2632#issuecomment-567699174) and had the following open concerns:
         * This design has far-reaching implications and we probably aren't going to be able to work them all out in advance. We probably need to start working through the implementation.
         * This seems like a great fit for the "const eval" project group, and we should schedule a dedicated meeting to talk over the scope of such a group in more detail.
         * Similarly, it would be worth scheduling a meeting to talk out this RFC in more detail and make sure the lang team is understanding it well.
         * We feel comfortable going forward with experimentation on nightly even in advance of this RFC being accepted, as long as that experimentation is gated.
-    * All of the above have happened in some form, so I believe it's time to have the T-lang meeting again.
+    * All of the above have happened in some form.
 
 # Unresolved questions
 [unresolved-questions]: #unresolved-questions
